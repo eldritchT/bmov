@@ -1,0 +1,51 @@
+<head>
+    <link href="https://vjs.zencdn.net/8.16.1/video-js.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://dronecvlt.ru/bite/bite.css">
+</head>
+<body>
+    <div class="bite-box">
+        <input type="text" placeholder="Найти в OMDb..." id="sf">
+        <button onclick="buildcollaps()">Искать</button>
+    </div>
+    <div id="player">
+        
+    </div>
+    <script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
+    <script src="https://unpkg.com/videojs-contrib-dash/dist/videojs-dash.js"></script>
+    <script>
+        const omdb_key = "ae3c5172";
+        const player = videojs(document.querySelector('.video-js'));
+        /* player.src({ src: 'http://hye1eaipby4w.matham.ws/06_20/05/17/7RORBWYC/577168.mpd?hc=5950b6c9af1b9b5&hi=ce491c4aa02e4e5&ht=a462f57525e56e0&hu=25b0c97a6c18248&t=1728137570', type: 'application/dash+xml'}); */
+
+        async function omdbsearch(t) {
+            var url = `http://www.omdbapi.com/?apikey=${omdb_key}&t=${t}`;
+            var req = await fetch(url);
+            if (req.ok) {
+                var data = await req.json();
+                return data;
+            }
+        }
+
+        async function collapssearch(id) {
+            var url = `http://api.ninsel.ws/embed/imdb/${id}`;
+            var req = await fetch(url);
+            if (req.ok) {
+                var data = req.text;
+                return data;
+            }
+        }
+        function getcollapsurl(id) {
+            return `http://api.ninsel.ws/embed/imdb/${id}`;
+        }
+        async function getcollaps(t) {
+            var ominfo = await omdbsearch(t);
+            var collaps = await collapssearch(ominfo.imdbID);
+            return collaps;
+        }
+        async function buildcollaps() {
+            var sf = document.getElementById("sf");
+            var om = await omdbsearch(sf.value);
+            location.href = getcollapsurl(om.imdbID);
+        }
+    </script>
+</body>
